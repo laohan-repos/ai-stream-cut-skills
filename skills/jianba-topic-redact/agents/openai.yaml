@@ -1,0 +1,4 @@
+interface:
+  display_name: "剪吧话题打码"
+  short_description: "遮挡指定话题中的敏感画面，核对移动与边界，保留教学操作、已有打码和剪辑"
+  default_prompt: "使用 $jianba-topic-redact 处理指定话题中识别出的敏感画面，保留教学操作和已有剪辑，核对遮挡、同源影响及真实预览后应用。"
