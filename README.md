@@ -11,6 +11,8 @@
 
 局部修改可独立使用，无需先执行全片精剪。只需要建议时，在请求中说明“先给方案，不应用”。
 
+局部修改会在实时 MCP Schema 支持时，按时间范围读取剪辑上下文，并使用 `previewMode=local` 生成改动及依赖窗口。每个窗口仍需真实声画核对；复杂声画依赖会明确回退完整素材预览。旧 MCP 沿原流程执行，需更新剪吧服务或安装包才能启用新接口，单独更新 Skill 不会升级 MCP。
+
 显式调用时，Codex 使用 `$jianba-ai-tutorial-edit` 或 `$jianba-local-edit`；Claude Code 使用 `/jianba-ai-tutorial-edit` 或 `/jianba-local-edit`。
 
 ## 使用前提
