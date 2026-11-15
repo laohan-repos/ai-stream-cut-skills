@@ -1,0 +1,4 @@
+interface:
+  display_name: "剪吧 AI 教程剪辑"
+  short_description: "通过剪吧主动清理重复、无信息执行与空等，保留讲解、关键操作和声画核对"
+  default_prompt: "使用 $jianba-ai-tutorial-edit 剪辑当前 AI 教程话题，主动清理无信息的机器执行与空等，保留必要讲解、关键操作和声画核对。"
