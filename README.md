@@ -1,6 +1,6 @@
 # 剪吧剪辑 Skills
 
-通过剪吧 MCP 在 Codex 和 Claude Code 中完成 AI 教程精剪与局部修改。两个 Skill 都要求读取真实项目状态、核对原片声画、审阅预览，并按用户授权应用修改。
+通过剪吧 MCP 在 Codex 和 Claude Code 中完成 AI 教程精剪、局部修改及字幕文字校对。四个 Skill 都要求读取真实项目状态，按任务需要核对声画、审阅预览，并按用户授权应用修改。
 
 ## 选择 Skill
 
@@ -8,12 +8,16 @@
 | --- | --- | --- |
 | [jianba-ai-tutorial-edit](skills/jianba-ai-tutorial-edit/SKILL.md) | 对教程话题或素材做整体精剪，清理重复讲解、无信息的机器执行和等待，保留完整教学步骤。 | 使用 jianba-ai-tutorial-edit 精剪当前 AI 教程，节奏自然偏紧，保留关键操作与结果，核对后应用。 |
 | [jianba-local-edit](skills/jianba-local-edit/SKILL.md) | 修改已定位的原话、时间段、选区或接点，完成恢复、删减、局部倍速与衔接修正，沿用范围外的剪辑决定。 | 使用 jianba-local-edit 将当前选区恢复为原速，核对衔接后应用，保留其他剪辑。 |
+| [jianba-subtitle-proofread-all](skills/jianba-subtitle-proofread-all/SKILL.md) | 通读全片当前最终字幕，校对错字、术语、数字、单位与必要标点，处理话题继承及全片覆盖。 | 使用 jianba-subtitle-proofread-all 校对当前全片字幕，只修正有依据的文字错误，核对后应用。 |
+| [jianba-subtitle-proofread-topic](skills/jianba-subtitle-proofread-topic/SKILL.md) | 只校对当前或指定话题的字幕，并检查目标改字在全片继承或覆盖下的生效情况。 | 使用 jianba-subtitle-proofread-topic 校对“模型参数设置”话题的字幕，保留其他话题，核对后应用。 |
 
 局部修改可独立使用，无需先执行全片精剪。只需要建议时，在请求中说明“先给方案，不应用”。
 
+字幕校对也可独立使用，只修改证实的文字错误，保留样式、分组、展示时间、显式换行及已有人工改写。全局校对在话题继承模式下回写对应话题，保留继承；已有全片覆盖时以当前全片字幕为基线做增量。话题校对不扫描其他话题，遇到全片覆盖时只同步能可靠一对一对应的目标错误，保留两处各自的人工内容；无法归属或可靠同步的部分会保留并报告，不重置继承或覆盖。
+
 局部修改会在实时 MCP Schema 支持时，按时间范围读取剪辑上下文，并使用 `previewMode=local` 生成改动及依赖窗口。每个窗口仍需真实声画核对；复杂声画依赖会明确回退完整素材预览。旧 MCP 沿原流程执行，需更新剪吧服务或安装包才能启用新接口，单独更新 Skill 不会升级 MCP。
 
-显式调用时，Codex 使用 `$jianba-ai-tutorial-edit` 或 `$jianba-local-edit`；Claude Code 使用 `/jianba-ai-tutorial-edit` 或 `/jianba-local-edit`。
+显式调用时，Codex 使用 `$名称`，Claude Code 使用 `/名称`，将“名称”替换为表中的 Skill 名称。
 
 ## 使用前提
 
@@ -30,7 +34,8 @@ git clone https://github.com/laohan-repos/ai-stream-cut-skills.git
 cd ai-stream-cut-skills
 SKILLS_REPO="$(pwd -P)"
 
-for skill in jianba-ai-tutorial-edit jianba-local-edit; do
+for skill in jianba-ai-tutorial-edit jianba-local-edit \
+  jianba-subtitle-proofread-all jianba-subtitle-proofread-topic; do
   if [ ! -f "$SKILLS_REPO/skills/$skill/SKILL.md" ]; then
     printf '未找到 Skill，跳过：%s\n' "$SKILLS_REPO/skills/$skill"
     continue

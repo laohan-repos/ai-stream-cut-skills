@@ -1,0 +1,4 @@
+interface:
+  display_name: "剪吧话题字幕校对"
+  short_description: "只校对当前或指定话题的字幕，保留其他话题、人工修改及全片字幕覆盖关系"
+  default_prompt: "使用 $jianba-subtitle-proofread-topic 校对我指定话题的字幕，只修正有依据的文字错误，保留其他话题、样式、排版、时间和已有人工修改。"

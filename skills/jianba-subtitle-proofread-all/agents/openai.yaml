@@ -1,0 +1,4 @@
+interface:
+  display_name: "剪吧全局字幕校对"
+  short_description: "校对全片字幕文字和术语，保留样式、分组、时间、人工修改与话题继承关系"
+  default_prompt: "使用 $jianba-subtitle-proofread-all 校对当前全片最终字幕，只修正有依据的文字错误，保留样式、排版、时间、人工修改和字幕继承关系。"
