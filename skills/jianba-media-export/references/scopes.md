@@ -6,17 +6,19 @@
 
 | 用户意图 | target |
 | --- | --- |
-| 当前剪后全片 | `{type:"project"}` |
-| 一个话题 | `{type:"topic",topicId}` |
-| 已保存组合 | `{type:"composition",compositionId}` |
+| 普通“导出／导出视频／导出成片”，或明确全片 | `{type:"project"}` |
+| 明确要求当前或指定话题 | `{type:"topic",topicId}` |
+| 已保存组合，或选定多个话题合成一条 | `{type:"composition",compositionId}` |
 | 指定话题分别导出 | `{type:"topics",topicIds:[...]}` |
 | 所有真实话题各导一份 | `{type:"all_topics"}` |
+
+默认 `project` 导出当前项目完整剪后时间线的一条成片。界面停在某话题、只选中部分内容或前文导出过单题，都不改变新请求的默认范围；显式“当前话题／这个话题”才从 active 编辑器读取话题。
 
 `topics` 按给定顺序分别输出，不拼接；`all_topics` 也不是全片。每批最多100个真实话题，没有话题时不把全片冒充逐话题。使用 `target` 后省略旧 `scopeId/topicIds`。
 
 “当前话题”从 active 编辑器取 projectId/scopeId；普通编辑器上下文没有 compositionId，也不会把播放选区自动变成导出范围。已知组合 ID 直接复用；仅有组合名称时，先用已有项目中的组合列表识别，缺列表才读取必要的项目/组合上下文，不为查 ID 通读转写。多个匹配仍不明确时只问目标。
 
-“这几题合成一条”先识别同顺序、同引用的已保存组合，按 composition 统一导出。没有合适组合时，该请求可授权建立对应组合：进入实时 `composition` 指南，按用户指定顺序建立、真实预览并保存，只保留原话题的剪辑决定。若仅要导出现有组合，不重新选材、制造片头或重做预览。明确顺序直接采用，顺序仍不清才询问。
+“导出1、3、4话题”“选择这几个话题导出”默认合成一条，按用户列出顺序播放。序号先从当前项目真实话题列表映射为 ID，不把“1”直接当 topicId；已有明确且未变的列表直接复用。先识别同顺序、同完整话题引用的已保存组合，按 composition 统一导出。没有合适组合时，该请求可授权建立对应组合：读取实时 `composition` 指南和所选话题上下文，plan.topicIds 使用选中 ID，plan.items 按指定顺序逐个使用 kind=topic，不截取 excerpt、不改原话题删留或倍速；生成真实预览，核对新增接缝及字幕声画后保存。整题拼接只读取必要的范围、版本和绑定，不为重新选材通读全片转写。若仅要导出现有组合，不重新选材、制造片头或重做预览。明确顺序直接采用，顺序仍不清才询问。
 
 已保存组合也用 `get_export_context → export_video → get_export_job`。`compositionId` 必须来自真实项目；新链的 `exportContextKey` 与旧 `export_composition` 的 `compositionContextKey` 不互换。
 
