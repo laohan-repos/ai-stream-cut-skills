@@ -1,0 +1,539 @@
+{
+  "skill": "jianba-media-export",
+  "method": "隔离子代理根据模拟返回演绎动作，并用真实 MCP Zod Schema 校验拟调用；未执行真实项目导出，未运行 Claude Code/Claude 模型基准。",
+  "lastValidation": {
+    "casesPassed": 9,
+    "schemaValidatedCalls": 23
+  },
+  "cases": [
+    {
+      "id": "current_video",
+      "hostToolNaming": "codex",
+      "serviceName": "jianba",
+      "request": "导出当前话题。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": false,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "video",
+          "expectedVersion": 7,
+          "exportContextKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "target": {
+            "type": "topic",
+            "topicId": "topic-b"
+          },
+          "directory": "/Users/demo/Movies/Exports",
+          "ready": true,
+          "readyCount": 1,
+          "targetCount": 1,
+          "items": {
+            "total": 1,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-b",
+                "ready": true,
+                "duration": 12.5
+              }
+            ]
+          }
+        }
+      },
+      "checks": [
+        "从 active 编辑器显式选择当前话题，不以缺省 target 导出全片。",
+        "只读准备摘要，沿用媒体设置和目录；首次复用导出指南。"
+      ]
+    },
+    {
+      "id": "subtitle_only",
+      "hostToolNaming": "claude-code",
+      "serviceName": "video_edit",
+      "request": "只导出当前话题的字幕，放到 /Users/demo/Desktop/字幕，本次用这个目录就好。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "subtitles",
+          "expectedVersion": 7,
+          "exportContextKey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "target": {
+            "type": "topic",
+            "topicId": "topic-b"
+          },
+          "directory": "/Users/demo/Desktop/字幕",
+          "ready": true,
+          "readyCount": 1,
+          "targetCount": 1,
+          "items": {
+            "total": 1,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-b",
+                "ready": true,
+                "duration": 12.5
+              }
+            ]
+          }
+        },
+        "fullProjectSubtitleSelection": {
+          "scopeId": "all",
+          "mode": "override",
+          "text": "全片人工重写"
+        },
+        "topicScreenSubtitleSelection": {
+          "scopeId": "topic-b",
+          "mode": "manual",
+          "text": "话题人工校对"
+        }
+      },
+      "checks": [
+        "只提交字幕导出，保留话题自身已应用的人工校对。",
+        "上下文 overrides.directory 与执行顶层 directory 一致，只覆盖本次。"
+      ]
+    },
+    {
+      "id": "all_topics",
+      "hostToolNaming": "codex",
+      "serviceName": "jianba",
+      "request": "所有话题，各自导出一份视频。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "video",
+          "expectedVersion": 7,
+          "exportContextKey": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "target": {
+            "type": "all_topics"
+          },
+          "directory": "/Users/demo/Movies/Exports",
+          "ready": true,
+          "readyCount": 2,
+          "targetCount": 2,
+          "items": {
+            "total": 2,
+            "offset": 0,
+            "nextOffset": 1,
+            "items": [
+              {
+                "id": "topic-a",
+                "ready": true,
+                "duration": 12.5
+              }
+            ]
+          }
+        }
+      },
+      "checks": [
+        "一次 all_topics 批量请求，不能合成全片或逐题重复提交。",
+        "全批准备摘要足够时不强制读取所有子项内容页。"
+      ]
+    },
+    {
+      "id": "discuss_skill",
+      "hostToolNaming": "codex",
+      "serviceName": "jianba",
+      "request": "讨论下这个导出 Skill 的目录策略，先不导出。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        }
+      },
+      "checks": [
+        "不调用实际导出工具，回答目录策略讨论。"
+      ]
+    },
+    {
+      "id": "saved_composition",
+      "hostToolNaming": "claude-code",
+      "serviceName": "video_edit",
+      "request": "把刚才确认的“最终课件版”组合导出。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "all",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "conversationRecord": {
+          "compositionId": "22222222-2222-4222-8222-222222222222",
+          "compositionTitle": "最终课件版",
+          "saved": true,
+          "reviewed": true
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "video",
+          "expectedVersion": 7,
+          "exportContextKey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "target": {
+            "type": "composition",
+            "compositionId": "22222222-2222-4222-8222-222222222222"
+          },
+          "directory": "/Users/demo/Movies/Exports",
+          "ready": true,
+          "readyCount": 1,
+          "targetCount": 1,
+          "items": {
+            "total": 1,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "22222222-2222-4222-8222-222222222222",
+                "ready": true,
+                "duration": 12.5
+              }
+            ]
+          }
+        }
+      },
+      "checks": [
+        "复用已知保存组合及审阅结果，使用统一独立导出链。",
+        "不重新制作组合、读取全部转写或混用旧 compositionContextKey。"
+      ]
+    },
+    {
+      "id": "resume_partial",
+      "hostToolNaming": "claude-code",
+      "serviceName": "video_edit",
+      "request": "刚才连接断了，接着导出。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "conversationRecord": {
+          "request": {
+            "projectId": "11111111-1111-4111-8111-111111111111",
+            "target": {
+              "type": "topics",
+              "topicIds": [
+                "topic-a",
+                "topic-b"
+              ]
+            },
+            "kind": "video",
+            "directory": "/Users/demo/Movies/临时",
+            "resolution": "720P"
+          },
+          "jobId": "33333333-3333-4333-8333-333333333333",
+          "idempotencyKey": "previous-request"
+        },
+        "jobSummary": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "jobId": "33333333-3333-4333-8333-333333333333",
+          "kind": "video",
+          "status": "partial",
+          "total": 2,
+          "completedCount": 1,
+          "failedCount": 1,
+          "fileCount": 1
+        },
+        "resultPages": [
+          {
+            "total": 2,
+            "offset": 0,
+            "nextOffset": 1,
+            "items": [
+              {
+                "id": "topic-a",
+                "status": "done",
+                "files": [
+                  {
+                    "path": "/Users/demo/Movies/临时/A.mp4",
+                    "size": 12345
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "total": 2,
+            "offset": 1,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-b",
+                "status": "error",
+                "error": "临时编码器中断",
+                "files": []
+              }
+            ]
+          }
+        ],
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "video",
+          "expectedVersion": 7,
+          "exportContextKey": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "target": {
+            "type": "topics",
+            "topicIds": [
+              "topic-a",
+              "topic-b"
+            ]
+          },
+          "directory": "/Users/demo/Movies/临时",
+          "ready": true,
+          "readyCount": 2,
+          "targetCount": 2,
+          "items": {
+            "total": 2,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-a",
+                "scopeId": "topic-a",
+                "ready": true,
+                "duration": 12.5
+              },
+              {
+                "id": "topic-b",
+                "scopeId": "topic-b",
+                "ready": true,
+                "duration": 9.0
+              }
+            ]
+          }
+        },
+        "retryResponse": {
+          "jobId": "44444444-4444-4444-8444-444444444444",
+          "status": "queued"
+        }
+      },
+      "checks": [
+        "先查询原 job，再沿 nextOffset 读完结果。",
+        "按原 target、目录和编码刷新绑定，用新稳定键 retry，并查询新 jobId。"
+      ]
+    },
+    {
+      "id": "publish_package",
+      "hostToolNaming": "claude-code",
+      "serviceName": "video_edit",
+      "request": "先帮我策划一个完整发布包，三种语言、两版封面和五个平台文案。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        }
+      },
+      "checks": [
+        "识别制作/策划需求属于基础导出范围之外，不自动制作或导出。"
+      ]
+    },
+    {
+      "id": "stale_subtitles",
+      "hostToolNaming": "codex",
+      "serviceName": "jianba",
+      "request": "导出当前话题字幕。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "subtitles",
+          "expectedVersion": 7,
+          "exportContextKey": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "target": {
+            "type": "topic",
+            "topicId": "topic-b"
+          },
+          "directory": "/Users/demo/Movies/Exports",
+          "ready": false,
+          "readyCount": 0,
+          "targetCount": 1,
+          "items": {
+            "total": 1,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-b",
+                "ready": false,
+                "error": "字幕文档已过期，请检查当前范围并保存新文档。"
+              }
+            ]
+          }
+        }
+      },
+      "checks": [
+        "报告已保存来源过期，保留人工内容，不重置字幕或擅自改来源。"
+      ]
+    },
+    {
+      "id": "filtered_platforms",
+      "hostToolNaming": "claude-code",
+      "serviceName": "video_edit",
+      "request": "导出当前话题已有的 bilibili 和 youtube 平台资料。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "guideAlreadyRead": true,
+        "editor": {
+          "editors": [
+            {
+              "projectId": "11111111-1111-4111-8111-111111111111",
+              "scopeId": "topic-b",
+              "active": true,
+              "subtitleDirty": false,
+              "working": false,
+              "version": 7,
+              "playbackMode": "topic"
+            }
+          ]
+        },
+        "context": {
+          "projectId": "11111111-1111-4111-8111-111111111111",
+          "kind": "platforms",
+          "expectedVersion": 7,
+          "exportContextKey": "1111111111111111111111111111111111111111111111111111111111111111",
+          "target": {
+            "type": "topic",
+            "topicId": "topic-b"
+          },
+          "directory": "/Users/demo/Movies/Exports",
+          "ready": true,
+          "readyCount": 1,
+          "targetCount": 1,
+          "items": {
+            "total": 1,
+            "offset": 0,
+            "nextOffset": null,
+            "items": [
+              {
+                "id": "topic-b",
+                "ready": true,
+                "materials": {
+                  "platformCount": 1,
+                  "platforms": [
+                    {
+                      "platformId": "bilibili",
+                      "name": "B站",
+                      "scopeId": "topic-b"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "platformRegistry": [
+          {
+            "platformId": "bilibili",
+            "scopeId": "topic-b"
+          },
+          {
+            "platformId": "youtube",
+            "scopeId": "topic-a"
+          }
+        ]
+      },
+      "checks": [
+        "核对所选资料与目标范围交集，保持话题目标，不擅自扩大范围。",
+        "说明未适用的平台，不能宣称所有指定平台均导出。"
+      ]
+    }
+  ]
+}

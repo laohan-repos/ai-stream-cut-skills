@@ -1,6 +1,6 @@
-# 剪吧剪辑 Skills
+# 剪吧 Skills
 
-通过剪吧 MCP 在 Codex 和 Claude Code 中完成 AI 教程精剪、局部修改、字幕文字校对及话题画面打码。五个 Skill 都要求读取真实项目状态，按任务需要核对声画、审阅预览，并按用户授权应用修改。
+通过剪吧 MCP 在 Codex 和 Claude Code 中完成 AI 教程精剪、局部修改、字幕文字校对、话题画面打码及基础导出。六个 Skill 按任务读取真实项目状态，剪辑与校对保留必要声画审阅；基础导出复用已确认内容，按需检查异常。
 
 ## 选择 Skill
 
@@ -11,6 +11,7 @@
 | [jianba-subtitle-proofread-all](skills/jianba-subtitle-proofread-all/SKILL.md) | 通读全片当前最终字幕，校对错字、术语、数字、单位与必要标点，处理话题继承及全片覆盖。 | 使用 jianba-subtitle-proofread-all 校对当前全片字幕，只修正有依据的文字错误，核对后应用。 |
 | [jianba-subtitle-proofread-topic](skills/jianba-subtitle-proofread-topic/SKILL.md) | 只校对当前或指定话题的字幕，并检查目标改字在全片继承或覆盖下的生效情况。 | 使用 jianba-subtitle-proofread-topic 校对“模型参数设置”话题的字幕，保留其他话题，核对后应用。 |
 | [jianba-topic-redact](skills/jianba-topic-redact/SKILL.md) | 为当前或指定话题中识别出的敏感画面添加或修正遮挡，核对移动、边界、画中画及同源影响。 | 使用 jianba-topic-redact 遮挡当前话题中的密钥和账号，保留教学操作与已有打码，核对后应用。 |
+| [jianba-media-export](skills/jianba-media-export/SKILL.md) | 独立导出已有视频、字幕、封面或平台资料，支持全片、话题、保存组合及逐话题批量；默认沿用应用目录。 | 使用 jianba-media-export 将所有话题各自导出一份视频，沿用设置目录。 |
 
 局部修改可独立使用，无需先执行全片精剪。只需要建议时，在请求中说明“先给方案，不应用”。
 
@@ -20,13 +21,16 @@
 
 话题打码保留已有遮挡、剪辑与字幕，敏感文字默认采用不透明色块，并实际核对移动过程和首次、最后露出。只要求文字方案时不启动整题预览或应用；需要预览时，当前 MCP 仍渲染整个话题，短窗读取只减少媒体交付量。同源素材可能影响其他话题，超出授权且无法安全隔离时会保留草稿并报告；画面遮挡不等于处理了声音、外挂字幕或原片文件，也不构成全片无遗漏保证。
 
+基础导出使用新独立 MCP 导出能力，默认读取准备摘要和任务状态，终态再分页核对文件。普通“导出”不会升级为封面制作、翻译、平台文案或完整发布包；字幕来源保持目标当前继承/覆盖关系。发布包制作 Skill 后续另行设计。已有同名旧导出 Skill 时应更新该入口，避免新旧流程同时匹配。
+
 显式调用时，Codex 使用 `$名称`，Claude Code 使用 `/名称`，将“名称”替换为表中的 Skill 名称。
 
 ## 使用前提
 
 - 已运行剪吧，并在实际使用的 Codex 或 Claude Code 客户端中连接剪吧 MCP；本仓库不负责安装或配置 MCP。
 - 剪吧中已有目标项目与素材，MCP 具备相应的读取、预览和编辑权限。工具与参数以客户端实时提供的 Schema 和工作流指南为准。
-- 客户端能够实际读取并核对音频与画面。安装 Skill 不会省略声画审阅：媒体路径、`ready` 状态或交付完成均不代表已经听看。能力缺失时，应说明缺口并保留未审阅草稿。
+- 涉及剪辑、字幕/打码审阅或导出异常复核时，客户端需能实际读取对应音频与画面。媒体路径、`ready` 或交付状态不代表已经听看。普通基础导出复用既有审阅，不重复通读转写或观看全片。
+- 基础导出需 MCP 实际提供 `get_export_context` 的 `kind/target`、所选 `export_*` 和 `get_export_job`。更新 Skill 不会升级剪吧或 MCP；以实时工具 Schema 为准。
 
 ## 安装到 Codex 和 Claude Code
 
@@ -39,7 +43,7 @@ SKILLS_REPO="$(pwd -P)"
 
 for skill in jianba-ai-tutorial-edit jianba-local-edit \
   jianba-subtitle-proofread-all jianba-subtitle-proofread-topic \
-  jianba-topic-redact; do
+  jianba-topic-redact jianba-media-export; do
   if [ ! -f "$SKILLS_REPO/skills/$skill/SKILL.md" ]; then
     printf '未找到 Skill，跳过：%s\n' "$SKILLS_REPO/skills/$skill"
     continue
@@ -56,7 +60,7 @@ for skill in jianba-ai-tutorial-edit jianba-local-edit \
 done
 ```
 
-Codex 的入口位于 `~/.agents/skills`，Claude Code 的入口位于 `~/.claude/skills`。两端通过绝对路径软链接共享仓库中的同源文件，不复制内容，也不改动全局配置。已有同名目录、文件或软链接会跳过；如需替换，请先检查并自行处理原入口。
+Codex 的入口位于 `~/.agents/skills`，Claude Code 的入口位于 `~/.claude/skills`。两端通过绝对路径软链接共享仓库中的同源文件，不复制内容，也不改动全局配置。Codex 若已有 `~/.codex/skills` 中的同名入口，优先更新该入口，避免再安装一个旧版或重复副本。已有同名目录、文件或软链接会跳过；如需替换，请先检查并自行处理原入口。
 
 仓库需要保留在原位置；移动或删除后，软链接会失效。若已克隆仓库，直接进入该仓库目录，从 `SKILLS_REPO=...` 一行开始执行即可。
 
@@ -69,3 +73,7 @@ git pull
 ```
 
 软链接指向的文件会随仓库更新，两端无需重复复制安装。
+
+## 基础导出验证
+
+[行为场景集](evals/jianba-media-export.json) 覆盖当前话题、仅字幕、保存组合、逐话题批量、中断重试、讨论/策划误触发、字幕过期和物料范围过滤。已完成9个隔离场景检查，23个拟调用通过实时 MCP Zod Schema 校验；未在真实项目执行导出，也不作为 Claude Code 或 Claude 模型性能基准。场景集位于 Skill 目录外，正常使用不加载。
