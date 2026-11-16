@@ -1,6 +1,6 @@
 # 导出失败恢复
 
-仅在中断、版本冲突、任务失败、取消或结果异常时读取。保留原请求的 projectId、target、kind、source、资源 ID、format、overrides、绑定、幂等键及各次 jobId；补充状态即可，不重贴所有文件或上下文。
+仅在中断、版本冲突、任务失败、取消或结果异常时读取。保留原请求的 projectId、target、kind、source、资源 ID、format、overrides、绑定、幂等键、exportFolderId、实际作品目录及各次 jobId；补充状态即可，不重贴所有文件或上下文。
 
 | 当前事实 | 下一步 |
 | --- | --- |
@@ -16,7 +16,7 @@
 
 已授权导出遇到可恢复问题，可以在修正原因后进行一次有依据的重试；同因再次失败就报告具体阻塞，不无限重导出。素材或字幕需要另行修改且超出授权时先说明，不能为通过导出擅自改剪辑或人工内容。
 
-`retry_export_job` 只接受终态原任务。用原始完整选择与覆盖读取新的 `get_export_context`，再传原 jobId、最新 expectedVersion/exportContextKey，以及本次重试的新稳定 idempotencyKey。返回的是新 jobId，记录父子关系并继续查询新任务。原初始请求的幂等键可能复用旧失败任务，不能拿它冒充重试。
+`retry_export_job` 只接受终态原任务。用原始完整选择与覆盖、原任务返回的顶层 `exportFolderId` 读取新的 `get_export_context`，再传原 jobId、最新 expectedVersion/exportContextKey，以及本次重试的新稳定 idempotencyKey。返回的是新 jobId，记录父子关系并继续查询新任务。原初始请求的幂等键可能复用旧失败任务，不能拿它冒充重试。重试内部继承原文件夹，不向 retry 塞目录或文件夹 ID；新旧成功文件都留在原位置。
 
 重试保留整个已成功目标，只重跑失败/取消目标，不是单文件断点续传。失败目标已写文件也保留，重跑可能生成编号文件，不能承诺没有重复文件。已有成功目标的内容变化时，应用会拒绝混用旧成片；说明需要新的完整导出，不只换 key 强交。
 

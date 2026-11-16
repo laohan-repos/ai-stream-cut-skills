@@ -296,7 +296,8 @@
             "resolution": "720P"
           },
           "jobId": "33333333-3333-4333-8333-333333333333",
-          "idempotencyKey": "previous-request"
+          "idempotencyKey": "previous-request",
+          "exportFolderId": "55555555-5555-4555-8555-555555555555"
         },
         "jobSummary": {
           "projectId": "11111111-1111-4111-8111-111111111111",
@@ -306,7 +307,10 @@
           "total": 2,
           "completedCount": 1,
           "failedCount": 1,
-          "fileCount": 1
+          "fileCount": 1,
+          "parentDirectory": "/Users/demo/Movies/临时",
+          "directory": "/Users/demo/Movies/临时/本次作品",
+          "exportFolderId": "55555555-5555-4555-8555-555555555555"
         },
         "resultPages": [
           {
@@ -319,7 +323,7 @@
                 "status": "done",
                 "files": [
                   {
-                    "path": "/Users/demo/Movies/临时/A.mp4",
+                    "path": "/Users/demo/Movies/临时/本次作品/A.mp4",
                     "size": 12345
                   }
                 ]
@@ -374,6 +378,12 @@
                 "duration": 9.0
               }
             ]
+          },
+          "parentDirectory": "/Users/demo/Movies/临时",
+          "exportFolderId": "55555555-5555-4555-8555-555555555555",
+          "outputFolder": {
+            "name": "本次作品",
+            "directory": "/Users/demo/Movies/临时/本次作品"
           }
         },
         "retryResponse": {
@@ -383,7 +393,8 @@
       },
       "checks": [
         "先查询原 job，再沿 nextOffset 读完结果。",
-        "按原 target、目录和编码刷新绑定，用新稳定键 retry，并查询新 jobId。"
+        "按原 target、目录和编码刷新绑定，用新稳定键 retry，并查询新 jobId。",
+        "刷新上下文带原exportFolderId，重试内部继承原作品目录。"
       ]
     },
     {
@@ -611,6 +622,27 @@
       },
       "checks": [
         "先查原jobId并沿原范围恢复，不用新请求默认project覆盖原任务。"
+      ]
+    },
+    {
+      "id": "shared_export_folder",
+      "hostToolNaming": "codex",
+      "serviceName": "jianba",
+      "request": "导出当前完整成片，同时导出SRT。",
+      "fixtureFacts": {
+        "projectId": "11111111-1111-4111-8111-111111111111",
+        "videoSubmitResponse": {
+          "jobId": "33333333-3333-4333-8333-333333333333",
+          "exportFolderId": "55555555-5555-4555-8555-555555555555",
+          "parentDirectory": "/Users/demo/Movies/Exports",
+          "directory": "/Users/demo/Movies/Exports/课程成片"
+        }
+      },
+      "checks": [
+        "第一个任务省略exportFolderId，由应用创建作品文件夹。",
+        "视频完成后，字幕context和export调用均带返回folderID及相同project目标。",
+        "不将实际作品路径重新当directory父目录造成重复套层，不手动mkdir或搬文件。",
+        "新的另导一份请求不复用旧文件夹ID。"
       ]
     }
   ]

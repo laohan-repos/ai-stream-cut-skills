@@ -8,8 +8,8 @@ Codex 可显式用 `$jianba-media-export`，Claude Code 可用 `/jianba-media-ex
 
 共用 SKILL.md 仅使用标准 name/description；`agents/openai.yaml` 是 Codex 展示元数据。Claude 专用的 fork、动态上下文或仅手动调用配置不作为通用流程前提。本流程需要对话中的目标与授权，在当前上下文执行，但不能把前文的单题范围带入新的普通导出。
 
-新的独立导出需要匹配 kind/target 的 `get_export_context`、所选 export 工具及 `get_export_job`。`chapter_only` 没有导出权限；报告实际连接缺项，更新或切换用户已有合适连接后继续，不通过参数提升权限。
+新的独立导出需要匹配 kind/target 的 `get_export_context`、所选 export 工具及 `get_export_job`；作品文件夹续加还需上下文与执行工具实际支持 `exportFolderId`。若已连接的旧 MCP 仍散放文件且不支持该能力，报告需要更新剪吧/MCP，不自行建文件夹搬文件。`chapter_only` 没有导出权限；报告实际连接缺项，更新或切换用户已有合适连接后继续，不通过参数提升权限。
 
-新组合导出沿用主流程。旧 `export_composition`、桌面导出及旧发布包任务可能使用不同绑定、目录布局和查询工具；若用户提供的是旧任务 ID，按其真实类型和返回提示查询，可用兼容 `get_video_export` 读取原记录，不能将旧 key 或 manifest 直接用于新任务。不要因为旧文档提到占位文件，就给新独立导出追加目录或媒体.txt。
+新组合导出沿用主流程。旧 `export_composition`、桌面导出及旧发布包任务可能使用不同绑定、目录布局和查询工具；若用户提供的是旧任务 ID，按其真实类型和返回提示查询，可用兼容 `get_video_export` 读取原记录，不能将旧 key 或 manifest 直接用于新任务。新独立导出始终由应用创建干净作品文件夹，不因旧文档提到配套物就追加空封面目录或媒体.txt。
 
 缺少本次必要能力时准确说明需更新剪吧服务/连接。安装 Skill 不升级 MCP；不改用固定多语言、多封面或多平台旧发布流程替代基础导出。
