@@ -1,0 +1,3 @@
+interface:
+  display_name: "剪吧混合素材成片"
+  short_description: "按一句目标混合视频、图片与音频成片，支持局部修改、真实声画审阅和导出"
